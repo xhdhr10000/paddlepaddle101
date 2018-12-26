@@ -56,6 +56,6 @@ for data in paddle.dataset.mnist.test()():
 
     if label == lab:
         bingo = bingo + 1
-#    if count > 2000:
-#        break
+    if count > 200:
+        break
 print('Total count: %d/%d, rate %f' % (bingo, count, float(bingo) / count))
