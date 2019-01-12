@@ -18,9 +18,12 @@ except ImportError:
 def load_image(file):
     im = Image.open(file).convert('L')
     im = im.resize((64, 64), Image.ANTIALIAS)
-    im = np.array(im).reshape(1, 1, 64, 64).astype(np.float32)
+    im = np.array(im).astype(np.float32) / 255.0
+    im = 1 - im
     im = (im - np.mean(im)) / np.std(im)
-    return im
+    out = Image.fromarray(im * 255).convert('RGB')
+    out.save('out.png')
+    return im.reshape(1, 1, 64, 64)
 
 path = 'dataset/1.png'
 if len(sys.argv) > 1:

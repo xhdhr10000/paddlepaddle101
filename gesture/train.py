@@ -77,6 +77,6 @@ trainer = Trainer(
 
 trainer.train(
     reader=train_reader,
-    num_epochs=300000,
+    num_epochs=30,
     event_handler=event_handler_plot,
     feed_order=feed_order)

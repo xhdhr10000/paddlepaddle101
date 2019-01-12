@@ -61,19 +61,28 @@ def distort_color(img):
 
     return img
 
-def load_image(path, rotate=True, color_jitter=True):
+def load_image(path, rotate=True, color_jitter=False):
     im = Image.open(path).convert('L')
 
     if rotate: im = rotate_image(im)
-    im = random_crop(im, DATA_DIM)
+#    im = random_crop(im, DATA_DIM)
     if color_jitter:
         im = distort_color(im)
     if np.random.randint(0, 2) == 1:
         im = im.transpose(Image.FLIP_LEFT_RIGHT)
 
     im = im.resize((64, 64), Image.ANTIALIAS)
-    im = np.array(im).astype(np.float32) / 255
-    im = (im - 0.7187839323723758) / 0.18509459975003092
+    im = np.array(im).astype('float32') / 255.0
+    im = 1 - im
+    """
+    for i in range(len(im)):
+        for j in range(len(im[i])):
+            if im[i][j] < 0.2: im[i][j] = 0
+    """
+    im = (im - np.mean(im)) / np.std(im)
+
+    out = Image.fromarray(im * 255).convert('RGB')
+    out.save('out.png')
 
     return im.reshape(1, 1, 64, 64)
 
