@@ -15,9 +15,9 @@ except ImportError:
     from paddle.fluid.inferencer import *
 
 
-use_cuda = False
-# use_cuda = True
-place = fluid.CUDAPlace(1) if use_cuda else fluid.CPUPlace()
+#use_cuda = False
+use_cuda = True
+place = fluid.CUDAPlace(0) if use_cuda else fluid.CPUPlace()
 
 def train_func():
     label = fluid.layers.data(name='label', shape = [1],dtype = 'int64')
@@ -59,6 +59,11 @@ exe = fluid.Executor(place)
 exe.run( fluid.default_startup_program() )
 
 BATCH_SIZE = 128
+c = 0
+for data in paddle.dataset.mnist.train()():
+    print(data)
+    c = c+1
+    if (c > 2): break
 
 train_reader = paddle.batch(
     paddle.reader.shuffle(
@@ -77,9 +82,10 @@ trainer = Trainer(
     place= place,
     optimizer_func= optimizer_func)
 
+"""
 trainer.train(
     reader=train_reader,
     num_epochs=3,
     event_handler=event_handler_plot,
     feed_order=feed_order)
-
+"""

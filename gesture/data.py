@@ -1,11 +1,15 @@
 import os
+import math
 import numpy as np
 from PIL import Image, ImageEnhance
 
-DATA_DIM = 224
+DATA_DIM = 64
 
 train_list = os.path.join('dataset', 'train_list.txt')
 test_list = os.path.join('dataset', 'val_list.txt')
+
+#img_mean = np.array([0.76272706, 0.71062325, 0.66332501])
+#img_std = np.array([0.15415326, 0.19708927, 0.21725869])
 
 def random_crop(img, size, scale=[0.08, 1.0], ratio=[3. / 4., 4. / 3.]):
     aspect_ratio = math.sqrt(np.random.uniform(*ratio))
@@ -58,19 +62,20 @@ def distort_color(img):
     return img
 
 def load_image(path, rotate=True, color_jitter=True):
-    im = Image.open(path)
+    im = Image.open(path).convert('L')
 
     if rotate: im = rotate_image(im)
-#    im = random_crop(im, DATA_DIM)
+    im = random_crop(im, DATA_DIM)
     if color_jitter:
         im = distort_color(im)
     if np.random.randint(0, 2) == 1:
         im = im.transpose(Image.FLIP_LEFT_RIGHT)
 
-#    im = im.resize((64, 64), Image.ANTIALIAS)
-    im = np.array(im).reshape(1, 3, 64, 64).astype(np.float32)
-    im = im / 255.0 * 2.0 - 1.0
-    return im
+    im = im.resize((64, 64), Image.ANTIALIAS)
+    im = np.array(im).astype(np.float32) / 255
+    im = (im - 0.7187839323723758) / 0.18509459975003092
+
+    return im.reshape(1, 1, 64, 64)
 
 def load_dataset(path):
     s = []
@@ -80,8 +85,7 @@ def load_dataset(path):
             path = line.split(' ')[0]
             path = os.path.join('dataset', path)
             label = line.split(' ')[1]
-            for i in range(10):
-                s.append((path, label))
+            s.append((path, label))
     np.random.shuffle(s)
     return s
 

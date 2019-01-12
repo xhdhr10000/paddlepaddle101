@@ -17,12 +17,12 @@ except ImportError:
     from paddle.fluid.inferencer import *
 
 
-use_cuda = False
-# use_cuda = True
-place = fluid.CUDAPlace(1) if use_cuda else fluid.CPUPlace()
+#use_cuda = False
+use_cuda = True
+place = fluid.CUDAPlace(0) if use_cuda else fluid.CPUPlace()
 
 def train_func():
-    label = fluid.layers.data(name='label', shape = [1],dtype = 'int64')
+    label = fluid.layers.data(name='label', shape=[1], dtype = 'int64')
 #     predict = softmax_regression()
 #     predict = multilayer_perceptron()
     predict = convolutional_neural_network()
@@ -77,7 +77,6 @@ trainer = Trainer(
 
 trainer.train(
     reader=train_reader,
-    num_epochs=30,
+    num_epochs=300000,
     event_handler=event_handler_plot,
     feed_order=feed_order)
-

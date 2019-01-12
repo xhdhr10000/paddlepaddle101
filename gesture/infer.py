@@ -19,8 +19,7 @@ def load_image(file):
     im = Image.open(file).convert('L')
     im = im.resize((64, 64), Image.ANTIALIAS)
     im = np.array(im).reshape(1, 1, 64, 64).astype(np.float32)
-    print(len(im))
-    im = im / 255.0 * 2.0 - 1.0
+    im = (im - np.mean(im)) / np.std(im)
     return im
 
 path = 'dataset/1.png'
@@ -40,6 +39,7 @@ inferencer = Inferencer(
     param_path=params_dirname,
     place=place )
 
+print('input shape: {}'.format(img.shape))
 results = inferencer.infer({'img': img})
 lab = np.argsort(results)  # probs and lab are the results of one batch data
 print("Label of %s is: %d" % (path, lab[0][0][-1]))
